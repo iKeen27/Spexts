@@ -1,0 +1,393 @@
+<Window x:Class="Spexts.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Spexts.Controls"
+        Title="Spexts — System Diagnostics"
+        Icon="app.ico"
+        MinWidth="1000" MinHeight="700"
+        Width="1280" Height="860"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        Background="{StaticResource BgDeepBrush}"
+        FontFamily="{StaticResource PrimaryFont}">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0"
+                      CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top accent line -->
+            <RowDefinition Height="3"/>
+            <!-- Custom Title Bar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Body -->
+            <RowDefinition Height="*"/>
+            <!-- Footer status bar -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════ TOP ACCENT LINE ═══════════ -->
+        <Border Grid.Row="0" Background="{StaticResource AccentGradientBrush}"/>
+
+        <!-- ═══════════ CUSTOM TITLE BAR ═══════════ -->
+        <Border Grid.Row="1" Background="#161B22" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                MouseLeftButtonUp="TitleBar_MouseLeftButtonUp">
+            <Grid Height="32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Drag area / Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0"
+                            VerticalAlignment="Center">
+                    <!-- Logo dot -->
+                    <Border Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0"
+                            VerticalAlignment="Center">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource AccentCyan}" Offset="0"/>
+                                <GradientStop Color="{StaticResource AccentGreen}" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <TextBlock Text="S P E X T S" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="—  System Diagnostics" FontSize="11"
+                               Foreground="{StaticResource TextTertiaryBrush}"
+                               VerticalAlignment="Center" Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <!-- Window Chrome Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="─" Command="{Binding MinimizeCommand}"
+                            Style="{StaticResource ChromeButtonStyle}" FontSize="11"/>
+                    <Button x:Name="MaximizeButton" Content="□" Command="{Binding MaximizeCommand}"
+                            Style="{StaticResource ChromeButtonStyle}" FontSize="11"/>
+                    <Button Content="✕" Command="{Binding CloseCommand}"
+                            Style="{StaticResource ChromeCloseButtonStyle}" FontSize="11"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ HEADER BAR ═══════════ -->
+        <Border Grid.Row="2" Background="#0F1318" Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- App Identity -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="10" Height="10" CornerRadius="5" Margin="0,0,12,0"
+                            VerticalAlignment="Center">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource AccentCyan}" Offset="0"/>
+                                <GradientStop Color="{StaticResource AccentGreen}" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <TextBlock Text="S P E X T S" FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <Border Background="#1C2128" CornerRadius="4" Padding="8,3"
+                            Margin="16,0,0,0" VerticalAlignment="Center"
+                            BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1">
+                        <TextBlock Text="v2.1" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </Border>
+
+                    <TextBlock Text="System Information &amp; Diagnostics"
+                               FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="20,0,0,0" Opacity="0.7"/>
+                </StackPanel>
+
+                <!-- Export Controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ComboBox ItemsSource="{Binding ExportFormats}"
+                              SelectedItem="{Binding ExportFormat}"
+                              Style="{StaticResource DarkComboBox}"
+                              Margin="0,0,10,0"/>
+
+                    <Button Content="⬇  Export Report"
+                            Command="{Binding ExportCommand}"
+                            Style="{StaticResource ExportButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ DASHBOARD BODY (MasonryPanel) ═══════════ -->
+        <ScrollViewer Grid.Row="3"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Style="{StaticResource DarkScrollViewer}"
+                      Padding="12,8,12,16">
+
+            <controls:MasonryPanel DesiredColumnWidth="392" ColumnSpacing="0">
+
+                <!-- ═══ Panel 1: OS & System ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="OS &amp; System" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="⊞" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding SystemInfo.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 2: Motherboard & BIOS ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Motherboard &amp; BIOS" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="⚙" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Motherboard.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 3: CPU Details (Live) ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="CPU Details" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <Border Background="#1A3A1A" CornerRadius="4" Padding="6,2"
+                                            Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="LIVE" FontSize="9" FontWeight="Bold"
+                                                   Foreground="{StaticResource AccentGreenBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="⚡" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Cpu.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 4: Memory (RAM) ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Memory (RAM)" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="◩" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Memory.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 5: GPU & Display (Live) ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="GPU &amp; Display" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <Border Background="#1A3A1A" CornerRadius="4" Padding="6,2"
+                                            Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="LIVE" FontSize="9" FontWeight="Bold"
+                                                   Foreground="{StaticResource AccentGreenBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="◈" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Gpu.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 6: Storage Drives ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Storage Drives" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="◉" FontSize="16" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Storage.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 7: Battery (Collapsed if no battery) ═══ -->
+                <Border Style="{StaticResource DashboardCard}"
+                        Visibility="{Binding Battery.HasBattery, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Battery" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="🔋" FontSize="14" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Battery.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 8: Security & Tweaks ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Security &amp; Tweaks" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="🛡" FontSize="14" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Security.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══ Panel 9: Network Diagnostics ═══ -->
+                <Border Style="{StaticResource DashboardCard}">
+                    <StackPanel>
+                        <Border Background="{StaticResource BgCardHeaderBrush}"
+                                CornerRadius="10,10,0,0" Padding="16,12">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="3" Height="16" CornerRadius="2"
+                                            Background="{StaticResource AccentGradientVerticalBrush}"
+                                            Margin="0,0,10,0"/>
+                                    <TextBlock Text="Network Diagnostics" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="🌐" FontSize="14" HorizontalAlignment="Right"
+                                           Foreground="{StaticResource AccentCyanBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </Border>
+                        <Border Height="1" Background="{StaticResource BorderSubtleBrush}"/>
+                        <ItemsControl ItemsSource="{Binding Network.Rows}" Padding="0,4"/>
+                    </StackPanel>
+                </Border>
+
+            </controls:MasonryPanel>
+        </ScrollViewer>
+
+        <!-- ═══════════ FOOTER STATUS BAR ═══════════ -->
+        <Border Grid.Row="4" Background="#0F1318" Padding="20,8"
+                BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,1,0,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Ellipse Width="7" Height="7" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource AccentGreenBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                        <Setter Property="Fill" Value="#F0883E"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding StatusText}"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Foreground="{StaticResource TextTertiaryBrush}"
+                               FontSize="11" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="● Running as Administrator"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAdmin}" Value="False">
+                                        <Setter Property="Text" Value="○ Limited Mode (No Admin)"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
