@@ -1,3 +1,5 @@
+<img width="1920" height="951" alt="image" src="https://github.com/user-attachments/assets/2223b0ca-c667-401b-b50a-05ef4f1bf996" />
+<img width="1920" height="1032" alt="image" src="https://github.com/user-attachments/assets/fcb33d2e-2dd9-4f67-9ae3-f5b40f2c8dfd" />
 # Spexts 🚀
 
 > A system diagnostic utility that analyzes PC and BIOS specifications to help apply accurate and targeted performance tweaks.
